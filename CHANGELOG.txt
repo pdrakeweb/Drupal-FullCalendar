@@ -1,6 +1,9 @@
 FullCalendar 7.x-1.x, xxxx-xx-xx
 --------------------------------
 
+FullCalendar 6.x-2.x, xxxx-xx-xx
+--------------------------------
+
 FullCalendar 6.x-1.x, xxxx-xx-xx
 --------------------------------
 
