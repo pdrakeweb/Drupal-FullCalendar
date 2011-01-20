@@ -171,6 +171,15 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
     'day' => $vars['options']['defaults']['fc_day'],
     'agenda' => $vars['options']['times']['fc_timeformat'],
     'clock' => $vars['options']['times']['fc_clock'],
+    'monthNames' => array_values(date_month_names(TRUE)),
+    'monthNamesShort' => array_values(date_month_names_abbr(TRUE)),
+    'dayNames' => date_week_days(TRUE),
+    'dayNamesShort' => date_week_days_abbr(TRUE),
+    'allDayText' => t('All day'),
+    'dayString' => t('Day'),
+    'weekString' => t('Week'),
+    'monthString' => t('Month'),
+    'todayString' => t('Today'),
   );
   drupal_add_js(array('fullcalendar' => $settings), 'setting');
   drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.views.js', 'module');

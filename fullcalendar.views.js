@@ -34,6 +34,17 @@ Drupal.behaviors.fullCalendar = function(context) {
     axisFormat: (Drupal.settings.fullcalendar.clock) ? 'HH:mm' : 'h(:mm)tt',
     weekMode: Drupal.settings.fullcalendar.weekMode,
     firstDay: Drupal.settings.fullcalendar.firstDay,
+    monthNames: Drupal.settings.fullcalendar.monthNames,
+    monthNamesShort: Drupal.settings.fullcalendar.monthNamesShort,
+    dayNames: Drupal.settings.fullcalendar.dayNames,
+    dayNamesShort: Drupal.settings.fullcalendar.dayNamesShort,
+    allDayText: Drupal.settings.fullcalendar.allDayText,
+    buttonText: {
+      today:  Drupal.settings.fullcalendar.todayString,
+      day: Drupal.settings.fullcalendar.dayString,
+      week: Drupal.settings.fullcalendar.weekString,
+      month: Drupal.settings.fullcalendar.monthString,
+    },
     events: function(start, end, callback) {
       var events = [];
 
