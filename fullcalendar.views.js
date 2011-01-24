@@ -43,7 +43,7 @@ Drupal.behaviors.fullCalendar = function(context) {
       today:  Drupal.settings.fullcalendar.todayString,
       day: Drupal.settings.fullcalendar.dayString,
       week: Drupal.settings.fullcalendar.weekString,
-      month: Drupal.settings.fullcalendar.monthString,
+      month: Drupal.settings.fullcalendar.monthString
     },
     events: function(start, end, callback) {
       var events = [];
