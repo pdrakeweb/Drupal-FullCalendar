@@ -3,7 +3,7 @@
 
 Drupal.behaviors.fullCalendar = function(context) {
   $('#fullcalendar-content').hide(); //hide the failover display
-  $('#fullcalendar').fullCalendar({
+  $('#fullcalendar:not(.fc-processed)').addClass('fc-processed').fullCalendar({
     defaultView: Drupal.settings.fullcalendar.defaultView,
     theme: Drupal.settings.fullcalendar.theme,
     header: {
