@@ -1,5 +1,6 @@
 FullCalendar 7.x-1.x, xxxx-xx-xx
 --------------------------------
+#1011696 by aspilicious: Fixed drag-and-drop for subdomains.
 #980180 follow-up by aspilicious: Extra trailing comma breaks fullcalendar in IE 7 & IE 6.
 #1033110 by tim.plunkett | geerlingguy: Added link to configuration page.
 #1033858 by aspilicious: Added translation support.
@@ -18,16 +19,22 @@ FullCalendar 7.x-1.2, 2011-01-19
 
 FullCalendar 6.x-2.x, xxxx-xx-xx
 --------------------------------
+#1011696 by aspilicious: Fixed drag-and-drop for subdomains.
 #980180 follow-up by aspilicious: Extra trailing comma breaks fullcalendar in IE 7 & IE 6.
 #1033858 by aspilicious: Added translation support.
 by tim.plunkett: Updated CHANGELOG.txt.
 
 FullCalendar 6.x-1.x, xxxx-xx-xx
 --------------------------------
+#1011696 by aspilicious: Fixed drag-and-drop for subdomains.
 #980180 follow-up by aspilicious: Extra trailing comma breaks fullcalendar in IE 7 & IE 6.
 #1033858 by aspilicious: Added translation support.
 
-FullCalendar 6.x-1.0, 2011-01-05
+FullCalendar 6.x-1.3, 2011-01-05
+--------------------------------
+#1016466 by tim.plunkett: Fix call to undefined function fullcalendar_get_path().
+
+FullCalendar 6.x-1.2, 2011-01-05
 --------------------------------
 #1013456 by aspilicious, tim.plunkett: Documentation clean-up.
 

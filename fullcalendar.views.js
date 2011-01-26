@@ -68,13 +68,13 @@ Drupal.behaviors.fullCalendar = function(context) {
       callback(events);
     },
     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
-      $.post('/fullcalendar/ajax/update/drop/'+ event.nid,
+      $.post(Drupal.settings.basePath + 'fullcalendar/ajax/update/drop/'+ event.nid,
         'field=' + event.field + '&index=' + event.index + '&day_delta=' + dayDelta + '&minute_delta=' + minuteDelta + '&all_day=' + allDay,
         fullcalendarUpdate);
       return false;
     },
     eventResize: function(event, dayDelta, minuteDelta, revertFunc) {
-      $.post('/fullcalendar/ajax/update/resize/'+ event.nid,
+      $.post(Drupal.settings.basePath + 'fullcalendar/ajax/update/resize/'+ event.nid,
         'field=' + event.field + '&index=' + event.index + '&day_delta=' + dayDelta + '&minute_delta=' + minuteDelta,
         fullcalendarUpdate);
       return false;
