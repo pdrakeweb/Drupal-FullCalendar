@@ -1,5 +1,6 @@
 FullCalendar 7.x-1.x, xxxx-xx-xx
 --------------------------------
+#1038442 by aspilicious: JS clean-up.
 #1039912 by tim.plunkett: Fixed FullCalendar doubling on page.
 #1011696 by aspilicious: Fixed drag-and-drop for subdomains.
 #980180 follow-up by aspilicious: Extra trailing comma breaks fullcalendar in IE 7 & IE 6.
@@ -20,6 +21,7 @@ FullCalendar 7.x-1.2, 2011-01-19
 
 FullCalendar 6.x-2.x, xxxx-xx-xx
 --------------------------------
+#1038442 by aspilicious: JS clean-up.
 #1039912 by tim.plunkett: Fixed FullCalendar doubling on page.
 #1011696 by aspilicious: Fixed drag-and-drop for subdomains.
 #980180 follow-up by aspilicious: Extra trailing comma breaks fullcalendar in IE 7 & IE 6.
@@ -28,6 +30,7 @@ by tim.plunkett: Updated CHANGELOG.txt.
 
 FullCalendar 6.x-1.x, xxxx-xx-xx
 --------------------------------
+#1038442 by aspilicious: JS clean-up.
 #1039912 by tim.plunkett: Fixed FullCalendar doubling on page.
 #1011696 by aspilicious: Fixed drag-and-drop for subdomains.
 #980180 follow-up by aspilicious: Extra trailing comma breaks fullcalendar in IE 7 & IE 6.
