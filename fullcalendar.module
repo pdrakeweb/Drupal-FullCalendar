@@ -189,8 +189,8 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
  * Prepare variables for template file invoked for node row type
  */
 function template_preprocess_views_view_node_fullcalendar(&$vars) {
-  if (isset($vars['view']->empty)) {
-    $vars['empty_text'] = $vars['view']->empty;
+  if (isset($vars['view']->empty_text)) {
+    $vars['empty_text'] = $vars['view']->empty_text;
     return;
   }
   $nid = $vars['row']->{$vars['field_alias']};
