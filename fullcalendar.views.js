@@ -95,6 +95,7 @@ Drupal.behaviors.fullCalendar = function(context) {
     eventRender: function( event, element, view ) {
       if (event.flyout) {
         element.children('a').prepend(event.flyout);
+        Drupal.attachBehaviors(element);
       }
     },
     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
