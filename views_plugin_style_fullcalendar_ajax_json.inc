@@ -130,6 +130,21 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
           $structure[$key] = array_pop(explode(' ', strip_tags($field[$value])));
         }
       }
+      if (TRUE) {
+        // Add unexcluded rendered fields to flyout.  This is should be in a seperate theme func.
+        // @todo - This doesn't work, but it feels right. :)
+        //$structure['flyout'] = theme(array('views_view_fields'), $this->view, $this->options, $row, 'nid');
+        $structure['flyout'] = '<span class="crayon-popup"><span class="crayon-popup-label">';
+        foreach ($this->display->display_options['fields'] as $field_name => $options) {
+          if (empty($options['exclude'])) {
+            $structure['flyout'] .= '<div>' . $field[$field_name] . '</div>';
+          }
+        }
+        if (spaces_access_admin()) {
+          $structure['flyout'] .= l('Edit', 'node/' . $field['nid'] . '/edit/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+        }
+        $structure['flyout'] .= '</span></span>';
+      }
       $jsonoutput[] = $structure;
     }
     return drupal_to_js($jsonoutput);
