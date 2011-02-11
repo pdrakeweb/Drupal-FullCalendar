@@ -46,6 +46,18 @@ function fullcalendar_views_plugins() {
       'uses grouping' => TRUE,
       'type' => 'normal',
       'parent' => 'default',
+      'even empty' => TRUE,
+      ),
+      'fullcalendar_ajax_json' => array(
+        'title' => t('Fullcalendar AJAJ Endpoint'),
+        'theme' => 'views_view_ajax_json',
+        'help' => t('Displays nodes in the JSON data format'),
+        'handler' => 'views_plugin_style_fullcalendar_ajax_json',
+        'uses row plugin' => TRUE,
+        'uses options' => TRUE,
+        'uses fields' => TRUE,
+        'uses grouping' => FALSE,
+        'type' => 'ajax',
       ),
     ),
     'row' => array(

@@ -7,3 +7,4 @@ dependencies[] = views
 dependencies[] = date
 dependencies[] = jquery_ui
 dependencies[] = jquery_update
+dependencies[] = views_ajax_endpoint
