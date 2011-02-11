@@ -92,4 +92,16 @@ a:hover span.fc-flyout span.fc-flyout-content * {
   border: none;
   background: none;
 }
+
+.fc-view {
+  overflow: visible;
+}
+
+.fc-event a {
+  overflow: visible;
+}
+
+.fc-event-vert span.fc-event-time{
+  overflow: visible;
+}
 /* End flyout */
