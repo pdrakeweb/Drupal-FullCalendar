@@ -113,7 +113,7 @@ Drupal.behaviors.fullCalendar = function(context) {
     loading: function( isLoading, view ) {
       // Show thobber while working.
       $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
-    },
+    }
   });
 
   var fullcalendarUpdate = function(response) {

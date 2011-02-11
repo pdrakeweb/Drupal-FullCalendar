@@ -13,22 +13,20 @@ index 565f56c..7f5d342 100644
 +  background: url(images/throbber.gif) right -18px no-repeat;
 +}
 diff --git a/fullcalendar.views.js b/fullcalendar.views.js
-index c305e9f..3b608d0 100644
+index c305e9f..4794129 100644
 --- a/fullcalendar.views.js
 +++ b/fullcalendar.views.js
-@@ -78,7 +78,11 @@ Drupal.behaviors.fullCalendar = function(context) {
+@@ -78,6 +78,10 @@ Drupal.behaviors.fullCalendar = function(context) {
          'field=' + event.field + '&index=' + event.index + '&day_delta=' + dayDelta + '&minute_delta=' + minuteDelta,
          fullcalendarUpdate);
        return false;
--    }
 +    },
 +    loading: function( isLoading, view ) {
 +      // Show thobber while working.
 +      $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
-+    },
+     }
    });
  
-   var fullcalendarUpdate = function(response) {
 diff --git a/images/throbber.gif b/images/throbber.gif
 new file mode 100644
 index 0000000000000000000000000000000000000000..4352e64e859bb5e4d2e438f00d9d34c1d27462d1
