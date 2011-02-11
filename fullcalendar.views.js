@@ -46,6 +46,24 @@ Drupal.behaviors.fullCalendar = function(context) {
       month: Drupal.settings.fullcalendar.monthString
     },
     events: function(start, end, callback) {
+      // Load events from AJAX callback, if set.
+      if (Drupal.settings.fullcalendar.ajax_callback) {
+        // TODO: refactor to use "data:" block to pass arg attributes from filters
+        var argattr = "";
+        if (window.location.href.indexOf('?') != -1) {
+          argattr = window.location.href.slice(window.location.href.indexOf('?'));
+        }
+        var argdate = new Date((start.getTime()+end.getTime())/2);
+        var argdateStr = argdate.getFullYear() + "-" + (argdate.getMonth()+1)
+        $.ajax({
+          url: Drupal.settings.fullcalendar.ajax_callback + '/' + argdateStr + argattr,
+          dataType: 'json',
+          success: function(events) {
+            callback(events);
+          }
+        });
+        return;  // Don't load events from page.
+      }
       var events = [];
 
       $('.fullcalendar_event').each(function() {

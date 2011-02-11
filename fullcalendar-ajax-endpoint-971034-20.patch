@@ -1,0 +1,275 @@
+diff --git fullcalendar.info fullcalendar.info
+index 296f6d0..2627d53 100644
+--- fullcalendar.info
++++ fullcalendar.info
+@@ -7,3 +7,4 @@ dependencies[] = views
+ dependencies[] = date
+ dependencies[] = jquery_ui
+ dependencies[] = jquery_update
++dependencies[] = views_ajax_endpoint
+diff --git fullcalendar.install fullcalendar.install
+index a3e0e81..184c2d6 100644
+--- fullcalendar.install
++++ fullcalendar.install
+@@ -55,9 +55,28 @@ function fullcalendar_requirements($phase) {
+ }
+ 
+ /**
++  * Implementation of hook_install()
++  */
++function fullcalendar_install() {
++  fullcalendar_update_6001();
++}
++
++/**
+  * Implementation of hook_uninstall().
+  */
+ function fullcalendar_uninstall() {
+   variable_del('fullcalendar_path');
+   variable_del('fullcalendar_compression_type');
+ }
++
++
++/**
++ * Install new date formats
++ */
++function fullcalendar_update_6001() {
++  include_once(drupal_get_path('module', 'date') .'/date.install');
++  date_install_create_format(NULL, t('Fullcalendar (Date Format)'), 'fullcalendar_date_format', 'c');
++
++  $ret = array(array('success' => TRUE, 'query' => $module . " additional date format installation successful."));
++  return $ret;
++}
+diff --git fullcalendar.module fullcalendar.module
+index e092fa2..af12aa0 100644
+--- fullcalendar.module
++++ fullcalendar.module
+@@ -181,6 +181,9 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
+     'monthString' => t('Month'),
+     'todayString' => t('Today'),
+   );
++  if (!empty($vars['options']['modules']['ajax_callback'])) {
++    $settings['ajax_callback'] = url($vars['options']['modules']['ajax_callback']);    
++  }
+   drupal_add_js(array('fullcalendar' => $settings), 'setting');
+   drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.views.js', 'module');
+ }
+diff --git fullcalendar.views.inc fullcalendar.views.inc
+index c1b0ad5..8d6cc37 100644
+--- fullcalendar.views.inc
++++ fullcalendar.views.inc
+@@ -46,6 +46,18 @@ function fullcalendar_views_plugins() {
+       'uses grouping' => TRUE,
+       'type' => 'normal',
+       'parent' => 'default',
++      'even empty' => TRUE,
++      ),
++      'fullcalendar_ajax_json' => array(
++        'title' => t('Fullcalendar AJAJ Endpoint'),
++        'theme' => 'views_view_ajax_json',
++        'help' => t('Displays nodes in the JSON data format'),
++        'handler' => 'views_plugin_style_fullcalendar_ajax_json',
++        'uses row plugin' => TRUE,
++        'uses options' => TRUE,
++        'uses fields' => TRUE,
++        'uses grouping' => FALSE,
++        'type' => 'ajax',
+       ),
+     ),
+     'row' => array(
+diff --git fullcalendar.views.js fullcalendar.views.js
+index c305e9f..bd5ae24 100644
+--- fullcalendar.views.js
++++ fullcalendar.views.js
+@@ -46,6 +46,24 @@ Drupal.behaviors.fullCalendar = function(context) {
+       month: Drupal.settings.fullcalendar.monthString
+     },
+     events: function(start, end, callback) {
++      // Load events from AJAX callback, if set.
++      if (Drupal.settings.fullcalendar.ajax_callback) {
++        // TODO: refactor to use "data:" block to pass arg attributes from filters
++        var argattr = "";
++        if (window.location.href.indexOf('?') != -1) {
++          argattr = window.location.href.slice(window.location.href.indexOf('?'));
++        }
++        var argdate = new Date((start.getTime()+end.getTime())/2);
++        var argdateStr = argdate.getFullYear() + "-" + (argdate.getMonth()+1)
++        $.ajax({
++          url: Drupal.settings.fullcalendar.ajax_callback + '/' + argdateStr + argattr,
++          dataType: 'json',
++          success: function(events) {
++            callback(events);
++          }
++        });
++        return;  // Don't load events from page.
++      }
+       var events = [];
+ 
+       $('.fullcalendar_event').each(function() {
+diff --git views_plugin_style_fullcalendar.inc views_plugin_style_fullcalendar.inc
+index 1672753..b7870fb 100644
+--- views_plugin_style_fullcalendar.inc
++++ views_plugin_style_fullcalendar.inc
+@@ -201,5 +201,19 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
+       '#default_value' => $this->options['modules']['fc_url_colorbox'],
+       '#description' => t('If checked, each event will open in colorbox (if it is installed).'),
+     );
++    $ajax_callback_options = array();
++    foreach ($this->view->display as $display) {
++      if ($display->display_options['style_plugin'] == "fullcalendar_ajax_json") {
++        $ajax_callback_options[$display->display_options['path']] = $display->display_options['path'];
++      }
++    }
++    array_unshift($ajax_callback_options, '<None>');
++    $form['modules']['ajax_callback'] = array(
++      '#type' => 'select',
++      '#title' => t('AJAX callback'),
++      '#options' => $ajax_callback_options,
++      '#default_value' => $this->options['modules']['ajax_callback'],
++      '#description' => t("(Advanced) When selected the fullcalendar plugin will use this callback to pull in JSON data to the calendar. Note: You will need to enable the AJAX Fullcalendar Endpoint to configure the fields for display."),
++    );
+   }
+ }
+diff --git views_plugin_style_fullcalendar_ajax_json.inc views_plugin_style_fullcalendar_ajax_json.inc
+new file mode 100644
+index 0000000..ad11e23
+--- /dev/null
++++ views_plugin_style_fullcalendar_ajax_json.inc
+@@ -0,0 +1,137 @@
++<?php
++
++// require_once(drupal_get_path('module', 'views_ajax_endpoint') . '/views_plugin_style_ajax.inc');
++
++class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
++  /**
++   * Set default options.
++   */
++  function option_definition() {
++    $options = parent::option_definition();
++    
++    return $options;
++  }
++
++  /**
++   * Extend the options form.
++   */
++  function options_form(&$form, &$form_state) {
++    parent::options_form($form, $form_state);
++    // Style types
++    $fields = array(0 => '<'. t('None') .'>');
++    foreach ($this->view->display_handler->get_option('fields') as $field => $definition) {
++      $fields[$field] = !empty($definition['label']) ? $definition['label'] : $field;
++    }
++    $form['field'] = array(
++      '#title' => t('Field'),
++      '#description' => t('Choose a field to be used for field updates.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['field'],
++    );
++    $form['index'] = array(
++      '#title' => t('index'),
++      '#description' => t('Choose a field to be used for index (delta) items.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['index'],
++    );
++    $form['nid'] = array(
++      '#title' => t('nid'),
++      '#description' => t('Choose a field to be used for the nid.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['nid'],
++    );
++    $form['title'] = array(
++      '#title' => t('title'),
++      '#description' => t('Choose a field to be used for the title.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['title'],
++    );
++    $form['start'] = array(
++      '#title' => t('start'),
++      '#description' => t('Choose a field to be used for start date.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['start'],
++    );
++    $form['end'] = array(
++      '#title' => t('end'),
++      '#description' => t('Choose a field to be used for end date.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['end'],
++    );
++    $form['url'] = array(
++      '#title' => t('url'),
++      '#description' => t('Choose a field to be used for the URL.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['url'],
++    );
++    $form['allDay'] = array(
++      '#title' => t('allDay'),
++      '#description' => t('Choose a field to be used for the allDay status.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['allDay'],
++    );
++    $form['className'] = array(
++      '#title' => t('className'),
++      '#description' => t('Choose a field to be used for the className.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['className'],
++    );
++    $form['editable'] = array(
++      '#title' => t('editable'),
++      '#description' => t('Choose a field to be used for edit status of the item.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['editable'],
++    );
++    $form['description'] = array(
++      '#title' => t('description'),
++      '#description' => t('Choose a field to be used for the description of the item.'),
++      '#type' => 'select',
++      '#options' => $fields,
++      '#default_value' => $this->options['description'],
++    );
++  }
++
++  function render() {
++    $output = parent::render();
++    drupal_set_header('Content-type: text/javascript; charset=utf-8');
++    $jsonoutput = array();
++    foreach ($this->rendered_fields as $field) {
++      $structure = array();
++      foreach ($this->options as $key => $value) {
++        if (!is_null($value) && $value && ($value != "0")) {
++          $structure[$key] = $field[$value];
++        }
++        if ($key == 'recurring') {
++          $structure[$key] = FALSE;
++        }
++        if ($key == 'allDay') {
++          $structure[$key] = FALSE;
++        }
++        if ($key == 'className') {
++          $structure[$key] = 'crayon crayon-' . theme('seed_crayon', $field[$value]);
++        }
++        if ($key == 'field') {
++          $structure[$key] = "field_date";
++        }
++        if ($key == 'start') {
++          $structure[$key] = array_pop(explode(' ', strip_tags($field[$value])));
++        }
++        if ($key == 'end') {
++          $structure[$key] = array_pop(explode(' ', strip_tags($field[$value])));
++        }
++      }
++      $jsonoutput[] = $structure;
++    }
++    return drupal_to_js($jsonoutput);
++  }
++}

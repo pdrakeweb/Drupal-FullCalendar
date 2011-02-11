@@ -201,5 +201,19 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
       '#default_value' => $this->options['modules']['fc_url_colorbox'],
       '#description' => t('If checked, each event will open in colorbox (if it is installed).'),
     );
+    $ajax_callback_options = array();
+    foreach ($this->view->display as $display) {
+      if ($display->display_options['style_plugin'] == "fullcalendar_ajax_json") {
+        $ajax_callback_options[$display->display_options['path']] = $display->display_options['path'];
+      }
+    }
+    array_unshift($ajax_callback_options, '<None>');
+    $form['modules']['ajax_callback'] = array(
+      '#type' => 'select',
+      '#title' => t('AJAX callback'),
+      '#options' => $ajax_callback_options,
+      '#default_value' => $this->options['modules']['ajax_callback'],
+      '#description' => t("(Advanced) When selected the fullcalendar plugin will use this callback to pull in JSON data to the calendar. Note: You will need to enable the AJAX Fullcalendar Endpoint to configure the fields for display."),
+    );
   }
 }

@@ -55,9 +55,28 @@ function fullcalendar_requirements($phase) {
 }
 
 /**
+  * Implementation of hook_install()
+  */
+function fullcalendar_install() {
+  fullcalendar_update_6001();
+}
+
+/**
  * Implementation of hook_uninstall().
  */
 function fullcalendar_uninstall() {
   variable_del('fullcalendar_path');
   variable_del('fullcalendar_compression_type');
+}
+
+
+/**
+ * Install new date formats
+ */
+function fullcalendar_update_6001() {
+  include_once(drupal_get_path('module', 'date') .'/date.install');
+  date_install_create_format(NULL, t('Fullcalendar (Date Format)'), 'fullcalendar_date_format', 'c');
+
+  $ret = array(array('success' => TRUE, 'query' => $module . " additional date format installation successful."));
+  return $ret;
 }
