@@ -78,7 +78,11 @@ Drupal.behaviors.fullCalendar = function(context) {
         'field=' + event.field + '&index=' + event.index + '&day_delta=' + dayDelta + '&minute_delta=' + minuteDelta,
         fullcalendarUpdate);
       return false;
-    }
+    },
+    loading: function( isLoading, view ) {
+      // Show thobber while working.
+      $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
+    },
   });
 
   var fullcalendarUpdate = function(response) {

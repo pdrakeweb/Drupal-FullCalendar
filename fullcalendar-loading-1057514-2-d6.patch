@@ -1,0 +1,61 @@
+diff --git a/fullcalendar.custom.css b/fullcalendar.custom.css
+index 565f56c..7f5d342 100644
+--- a/fullcalendar.custom.css
++++ b/fullcalendar.custom.css
+@@ -55,3 +55,9 @@ table.fc-header {
+ .fc-header .ui-state-default {
+   margin-bottom: 0;
+ }
++
++/* Add throbber when working */
++h2.fc-ajaxing {
++  padding-right: 18px !important;
++  background: url(images/throbber.gif) right -18px no-repeat;
++}
+diff --git a/fullcalendar.views.js b/fullcalendar.views.js
+index c305e9f..3b608d0 100644
+--- a/fullcalendar.views.js
++++ b/fullcalendar.views.js
+@@ -78,7 +78,11 @@ Drupal.behaviors.fullCalendar = function(context) {
+         'field=' + event.field + '&index=' + event.index + '&day_delta=' + dayDelta + '&minute_delta=' + minuteDelta,
+         fullcalendarUpdate);
+       return false;
+-    }
++    },
++    loading: function( isLoading, view ) {
++      // Show thobber while working.
++      $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
++    },
+   });
+ 
+   var fullcalendarUpdate = function(response) {
+diff --git a/images/throbber.gif b/images/throbber.gif
+new file mode 100644
+index 0000000000000000000000000000000000000000..4352e64e859bb5e4d2e438f00d9d34c1d27462d1
+GIT binary patch
+literal 1336
+zcmZ?wbhEHb<Y&-eIKlt|9L0Nis`pA%ACqZ0W;)@N+njSzi!NucztO$_;nuBN7o2;(
+z_1gQrKydH<v17;1ojZ5!+O>Q4?wxw{`P%dE_uhYh4g^5*`~UYq@csXH5cvQ7KL`K~
+zSNzZI=Nc01>=@u`q-Vg)2on0q!pa7ub%2-w<O~MZV+smPGeshAuV9j1vPXZ)s_4Zg
+z0blm?F5lHJc~VR=HP7i{py6bVF6{&7l)5xj0vklR3!K7(Rg1QYFtti5on3a~ZJymM
+z?r%P;ywt19&cFZtzoD_IPK1+#TeMn~jj^|vT}oS&iIItgarz7ytsYiUPDW1Q=^V-;
+zQ^n;LaLNhyPGsO_<d9pnaBB~b636y!YvlHDDlOO|$HUIEgK-zba;BAAx2|K{z%W<z
+zqA>Gjt;xM?96htN#UJ%?T-6rgZtrY<|Ka1OPl_mB6Jg*5LIzfMpw})>Vz{+posxMR
+zi-3r`qS(t<g)RnrwEUG43Oe*wcll%%&k<PE?6oU`VMzn`A=4tC6rG6&jJrxBpRMNI
+zz~??u`$?uK6LPS@%(e%beLbQ#xwA{FpzGMFwTqtn9<pFO_`<Sv-T`H+4LyuZys91-
+z1T;b$Sx>B$*%Owi{%D!o<ryByQRl+qK54LEGt&cTW=K<yM!?cVZCngJ5=sY`ZSy#~
+z;<;}_19t(Fh0uwX-a@aAIgJ?%4K9X!Hx3t-Gc&a<y6VfyEYZcllwOjkcwq5ePaQ5s
+zY=(QH1;+7+B{_9Z8<gLz;(qk#qezu{%L+A*imYzd1#CB1nOYVnD+OC}F*X1LqgSSB
+zYGoD6mdfA+fr6-3tU>L792{%`J$H8TJ!WCqrdP3uc@<m7O&87wT#BncXn6@a7<jSp
+z^u?}T@K~T?#apjrE1^Iu!AcRVVeAStRHOklJR%O2KbWQDeyA~Nj*!xm7b|?2gya}{
+z1Eo}%E_iZ>?o?A_*6SBIA!xCfoBN~lRKL}M9M}TG4QR6P1VqX}3Jj+37jp#`NeKl+
+z>&)2Oz@T0<g{i?Q;h`kwu0;pWJpQ;g>87*cX=&L8M`3NOk?4psB${7@Fdqq+!*ZTY
+z`Gde>Nly`jfCh%+>s)6fl&%oVSz>6|tzodh26yaXCJl3e3{HlJ4mJh>J;4c@TugrF
+zoRVf0bY%3*eemdGkJ{S6#H*_hFti2t8t>X5u<pt`7cuOy2TFLz83h;|$!EHz%ScR_
+z*u0%Vf}@dvDV)K=kK-I?gTU3UhUVkJovUPoZ}KU8c(P9?b{l6x|K`1+`Kz!y9XUW2
+z9X+wuQHSsG5wU|xubBE@JSb#fQ9gX?vE`Zo4lxJiO;aamCoc%S@HZ@`A;?8^Z`kIk
+J<y}BitpVd`)Z+jE
+
+literal 0
+HcmV?d00001
+

@@ -55,3 +55,9 @@ table.fc-header {
 .fc-header .ui-state-default {
   margin-bottom: 0;
 }
+
+/* Add throbber when working */
+h2.fc-ajaxing {
+  padding-right: 18px !important;
+  background: url(images/throbber.gif) right -18px no-repeat;
+}
