@@ -1,0 +1,60 @@
+diff --git fullcalendar.module fullcalendar.module
+index 16594bb..60389ae 100644
+--- fullcalendar.module
++++ fullcalendar.module
+@@ -185,6 +185,7 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
+     'firstDay' => $vars['options']['display']['fc_firstday'],
+     'weekMode' => $vars['options']['display']['fc_weekmode'],
+     'theme' => $vars['options']['modules']['fc_theme'],
++    'sameWindow' => $vars['options']['modules']['fc_window'],
+     'colorbox' => $vars['options']['modules']['fc_url_colorbox'],
+     'left' => $vars['options']['header']['fc_left'],
+     'center' => $vars['options']['header']['fc_center'],
+diff --git fullcalendar.views.js fullcalendar.views.js
+index 29b36bb..7eded21 100644
+--- fullcalendar.views.js
++++ fullcalendar.views.js
+@@ -16,11 +16,15 @@ Drupal.behaviors.fullCalendar = function(context) {
+       // Open in colorbox if exists, else open in new window.
+         if ($.colorbox) {
+           $.colorbox({href:calEvent.url, iframe:true, width:'80%', height:'80%'});
+-        } else {
++        }
++      }
++      else {
++        if (Drupal.settings.fullcalendar.sameWindow) {
++          window.open(calEvent.url, _self);
++        }
++        else {
+           window.open(calEvent.url);
+         }
+-      } else {
+-        window.open(calEvent.url);
+       }
+       return false;
+     },
+diff --git views_plugin_style_fullcalendar.inc views_plugin_style_fullcalendar.inc
+index 7dd8500..5db6419 100644
+--- views_plugin_style_fullcalendar.inc
++++ views_plugin_style_fullcalendar.inc
+@@ -20,6 +20,7 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
+       'contains' => array(
+         'fc_theme' => array('default' => FALSE),
+         'fc_url_colorbox' => array('default' => FALSE),
++        'fc_window' => array('default' => FALSE),
+       ),
+     );
+     $options['header'] = array(
+@@ -201,5 +202,12 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
+       '#default_value' => $this->options['modules']['fc_url_colorbox'],
+       '#description' => t('If checked, each event will open in colorbox (if it is installed).'),
+     );
++    $form['modules']['fc_window'] = array(
++      '#type' => 'checkbox',
++      '#title' => t('Open events in same window'),
++      '#default_value' => $this->options['modules']['fc_window'],
++      '#process' => array('views_process_dependency'),
++      '#dependency' => array('edit-style-options-modules-fc-url-colorbox' => array(0)),
++    );
+   }
+ }
