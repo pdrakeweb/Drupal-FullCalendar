@@ -55,3 +55,41 @@ table.fc-header {
 .fc-header .ui-state-default {
   margin-bottom: 0;
 }
+
+/* Add flyout */
+a span.fc-flyout {
+  display:none;
+}
+
+a:hover span.fc-flyout {
+  display:block;
+
+  position:absolute;
+  left:50%;
+  bottom:5px;
+  z-index:1000;
+
+  width:150px;
+  margin-left:-24px;
+  padding:0px 0px 10px;
+
+  overflow:hidden;
+  opacity:.8;
+  background: url(images/flyout.png) 20px 100% no-repeat;
+}
+
+a:hover span.fc-flyout span.fc-flyout-content {
+  display:block;
+  padding:10px;
+  background:#000;
+  color:#fff;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  text-decoration: none;
+}
+a:hover span.fc-flyout span.fc-flyout-content * {
+  text-decoration: none;
+  border: none;
+  background: none;
+}
+/* End flyout */

@@ -14,6 +14,7 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
         'fc_view' => array('default' => 'month'),
         'fc_firstday' => array('default' => '0'),
         'fc_weekmode' => array('default' => 'fixed'),
+        'fc_flyout' => array('default' => FALSE),
       ),
     );
     $options['modules'] = array(
@@ -94,6 +95,15 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
       '#prefix' => '<div class="views-left-30">',
       '#suffix' => '</div>',
     );
+    $form['display']['fc_flyout'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Event flyouts'),
+      '#default_value' => $this->options['display']['fc_flyout'],
+      '#description' => t('Display a flyout with more information (teaser, fields, etc) when an event is hovered.'),
+      '#prefix' => '<div class="views-left-30">',
+      '#suffix' => '</div>',
+    );
+
     $form['header'] = array(
       '#type' => 'fieldset',
       '#title' => t('Header elements'),

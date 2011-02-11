@@ -1,0 +1,190 @@
+diff --git a/fullcalendar.custom.css b/fullcalendar.custom.css
+index 565f56c..e4998bf 100644
+--- a/fullcalendar.custom.css
++++ b/fullcalendar.custom.css
+@@ -55,3 +55,41 @@ table.fc-header {
+ .fc-header .ui-state-default {
+   margin-bottom: 0;
+ }
++
++/* Add flyout */
++a span.fc-flyout {
++  display:none;
++}
++
++a:hover span.fc-flyout {
++  display:block;
++
++  position:absolute;
++  left:50%;
++  bottom:5px;
++  z-index:1000;
++
++  width:150px;
++  margin-left:-24px;
++  padding:0px 0px 10px;
++
++  overflow:hidden;
++  opacity:.8;
++  background: url(images/flyout.png) 20px 100% no-repeat;
++}
++
++a:hover span.fc-flyout span.fc-flyout-content {
++  display:block;
++  padding:10px;
++  background:#000;
++  color:#fff;
++  -moz-border-radius:5px;
++  -webkit-border-radius:5px;
++  text-decoration: none;
++}
++a:hover span.fc-flyout span.fc-flyout-content * {
++  text-decoration: none;
++  border: none;
++  background: none;
++}
++/* End flyout */
+diff --git a/fullcalendar.module b/fullcalendar.module
+index e092fa2..fb353fe 100644
+--- a/fullcalendar.module
++++ b/fullcalendar.module
+@@ -133,10 +133,37 @@ function fullcalendar_theme() {
+         'index' => NULL,
+       ),
+     ),
++    'fullcalendar_flyout' => array(
++      'arguments' => array(
++        'content' => NULL,
++      )
++    ),
+   );
+ }
+ 
+ /**
++ * Create a flyout that can be insterted into a link to show more information
++ * when hovered.
++ *
++ * @param $content
++ *   An array of lines to place in the flyout.
++ *
++ * @return
++ *   A string of the themed flyout, to be inserted in a link.
++ */
++function theme_fullcalendar_flyout($content) {
++  $output = "<span class='fc-flyout'>";
++  $output .= "<span class='fc-flyout-content'>";
++  foreach ($content as $line) {
++    $output .= strip_tags($line, '<a><em><strong>');
++    $output .= '<br />';
++  }
++  $output .= "</span>";
++  $output .= "</span>";
++  return $output;
++}
++
++/**
+  * Construct CSS classes for a node.
+  *
+  * @param $node
+@@ -214,6 +241,8 @@ function template_preprocess_views_view_node_fullcalendar(&$vars) {
+     }
+   }
+ 
++  $node->fc_flyout = !empty($vars['view']->style_options['display']['fc_flyout']);
++
+   $title_field = $vars['options']['fullcalendar_title_field'];
+   if (!empty($title_field) && !empty($node->{$title_field}[0]['value'])) {
+     $node->title = $node->{$title_field}[0]['value'];
+@@ -288,16 +317,25 @@ function _fullcalendar_set_display_times($node, $field_name, $field = NULL, $ite
+  * Set the text for the fallback display.
+  */
+ function theme_fullcalendar_link($node, $attributes, $index = 0) {
++  $options = array();
+   $text = date_format_date($attributes['start']);
+   if (!$attributes['allDay']) {
+     $text .= ' to ' . date_format_date($attributes['end']);
+   }
++  if ($node->fc_flyout) {
++    $options['html'] = TRUE;
++    $content[] = '<strong>' . $node->title . '</strong>';
++    $content[] = '<em>' . $text . '</em>';
++    $content[] = $node->teaser;
++    $text .= theme('fullcalendar_flyout', $content);
++  }
+ 
+   $attributes['index'] = $index;
+   $attributes['start'] = date_format($attributes['start'], DATE_FORMAT_DATETIME);
+   $attributes['end'] = date_format($attributes['end'], DATE_FORMAT_DATETIME);
++  $options['attributes'] = $attributes;
+ 
+-  return l($text, $node->url, array('attributes' => $attributes));
++  return l($text, $node->url, $options);
+ }
+ 
+ /**
+diff --git a/fullcalendar.views.js b/fullcalendar.views.js
+index c305e9f..243569e 100644
+--- a/fullcalendar.views.js
++++ b/fullcalendar.views.js
+@@ -62,11 +62,19 @@ Drupal.behaviors.fullCalendar = function(context) {
+             className: $(this).attr('cn'),
+             editable: $(this).attr('editable')
+           });
++          if ($(this).parent().find('.fc-flyout').length) {
++            events[events.length-1].flyout = $(this).parent().find('.fc-flyout');
++          }
+         });
+       });
+ 
+       callback(events);
+     },
++    eventRender: function( event, element, view ) {
++      if (event.flyout) {
++        element.children('a').prepend(event.flyout);
++      }
++    },
+     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+       $.post(Drupal.settings.basePath + 'fullcalendar/ajax/update/drop/'+ event.nid,
+         'field=' + event.field + '&index=' + event.index + '&day_delta=' + dayDelta + '&minute_delta=' + minuteDelta + '&all_day=' + allDay,
+diff --git a/images/flyout.png b/images/flyout.png
+new file mode 100755
+index 0000000000000000000000000000000000000000..04d33709797dc97d264a9c1e522d966b582f4f8c
+GIT binary patch
+literal 243
+zcmeAS@N?(olHy`uVBq!ia0vp^oIuRQ!3HGLSWET+DVAa<&kznEsNqQI04XT&h%5%G
+zzYfBTP8zc-fP#`Gt`Q}{`DrEPiAAXl<>lpinR(g8$%zH2dih1^v)|cB0TmT^x;TbN
+zOl>{0k+<1FfaSo&<slA&A<oh%d2MIbwdrLvo?+~~-YD<Ar=|9i=kmQ54>kR{!FtR-
+zqowI9(;AIQ2TB^3sqkG%%s$Yj*U98LZ^qp8bw8J{-1hZG_UXQVzpeYY-izA$RW`Hj
+gF^E~jm7n{K?V@{YUwEbP6rkM<p00i_>zopr0L@cYQvd(}
+
+literal 0
+HcmV?d00001
+
+diff --git a/views_plugin_style_fullcalendar.inc b/views_plugin_style_fullcalendar.inc
+index 1672753..e9cc9e2 100644
+--- a/views_plugin_style_fullcalendar.inc
++++ b/views_plugin_style_fullcalendar.inc
+@@ -14,6 +14,7 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
+         'fc_view' => array('default' => 'month'),
+         'fc_firstday' => array('default' => '0'),
+         'fc_weekmode' => array('default' => 'fixed'),
++        'fc_flyout' => array('default' => FALSE),
+       ),
+     );
+     $options['modules'] = array(
+@@ -94,6 +95,15 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
+       '#prefix' => '<div class="views-left-30">',
+       '#suffix' => '</div>',
+     );
++    $form['display']['fc_flyout'] = array(
++      '#type' => 'checkbox',
++      '#title' => t('Event flyouts'),
++      '#default_value' => $this->options['display']['fc_flyout'],
++      '#description' => t('Display a flyout with more information (teaser, fields, etc) when an event is hovered.'),
++      '#prefix' => '<div class="views-left-30">',
++      '#suffix' => '</div>',
++    );
++
+     $form['header'] = array(
+       '#type' => 'fieldset',
+       '#title' => t('Header elements'),

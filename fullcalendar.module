@@ -133,7 +133,34 @@ function fullcalendar_theme() {
         'index' => NULL,
       ),
     ),
+    'fullcalendar_flyout' => array(
+      'arguments' => array(
+        'content' => NULL,
+      )
+    ),
   );
+}
+
+/**
+ * Create a flyout that can be insterted into a link to show more information
+ * when hovered.
+ *
+ * @param $content
+ *   An array of lines to place in the flyout.
+ *
+ * @return
+ *   A string of the themed flyout, to be inserted in a link.
+ */
+function theme_fullcalendar_flyout($content) {
+  $output = "<span class='fc-flyout'>";
+  $output .= "<span class='fc-flyout-content'>";
+  foreach ($content as $line) {
+    $output .= strip_tags($line, '<a><em><strong>');
+    $output .= '<br />';
+  }
+  $output .= "</span>";
+  $output .= "</span>";
+  return $output;
 }
 
 /**
@@ -214,6 +241,8 @@ function template_preprocess_views_view_node_fullcalendar(&$vars) {
     }
   }
 
+  $node->fc_flyout = !empty($vars['view']->style_options['display']['fc_flyout']);
+
   $title_field = $vars['options']['fullcalendar_title_field'];
   if (!empty($title_field) && !empty($node->{$title_field}[0]['value'])) {
     $node->title = $node->{$title_field}[0]['value'];
@@ -288,16 +317,25 @@ function _fullcalendar_set_display_times($node, $field_name, $field = NULL, $ite
  * Set the text for the fallback display.
  */
 function theme_fullcalendar_link($node, $attributes, $index = 0) {
+  $options = array();
   $text = date_format_date($attributes['start']);
   if (!$attributes['allDay']) {
     $text .= ' to ' . date_format_date($attributes['end']);
+  }
+  if ($node->fc_flyout) {
+    $options['html'] = TRUE;
+    $content[] = '<strong>' . $node->title . '</strong>';
+    $content[] = '<em>' . $text . '</em>';
+    $content[] = $node->teaser;
+    $text .= theme('fullcalendar_flyout', $content);
   }
 
   $attributes['index'] = $index;
   $attributes['start'] = date_format($attributes['start'], DATE_FORMAT_DATETIME);
   $attributes['end'] = date_format($attributes['end'], DATE_FORMAT_DATETIME);
+  $options['attributes'] = $attributes;
 
-  return l($text, $node->url, array('attributes' => $attributes));
+  return l($text, $node->url, $options);
 }
 
 /**

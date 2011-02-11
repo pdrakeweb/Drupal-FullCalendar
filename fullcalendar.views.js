@@ -62,10 +62,18 @@ Drupal.behaviors.fullCalendar = function(context) {
             className: $(this).attr('cn'),
             editable: $(this).attr('editable')
           });
+          if ($(this).parent().find('.fc-flyout').length) {
+            events[events.length-1].flyout = $(this).parent().find('.fc-flyout');
+          }
         });
       });
 
       callback(events);
+    },
+    eventRender: function( event, element, view ) {
+      if (event.flyout) {
+        element.children('a').prepend(event.flyout);
+      }
     },
     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
       $.post(Drupal.settings.basePath + 'fullcalendar/ajax/update/drop/'+ event.nid,
