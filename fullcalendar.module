@@ -162,6 +162,7 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
     'firstDay' => $vars['options']['display']['fc_firstday'],
     'weekMode' => $vars['options']['display']['fc_weekmode'],
     'theme' => $vars['options']['modules']['fc_theme'],
+    'sameWindow' => $vars['options']['modules']['fc_window'],
     'colorbox' => $vars['options']['modules']['fc_url_colorbox'],
     'left' => $vars['options']['header']['fc_left'],
     'center' => $vars['options']['header']['fc_center'],
