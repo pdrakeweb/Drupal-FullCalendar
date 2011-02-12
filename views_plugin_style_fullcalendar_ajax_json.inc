@@ -127,7 +127,7 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
           $structure[$key] = array_pop(explode(' ', strip_tags($field[$value])));
         }
         if ($key == 'end') {
-          $structure[$key] = array_pop(explode(' ', strip_tags($field[$value])));
+          $structure[$key] = array_shift(explode(' ', strip_tags($field[$value])));
         }
       }
       if (TRUE) {
