@@ -149,7 +149,6 @@ Drupal.behaviors.fullCalendar = function(context) {
     eventRender: function( event, element, view ) {
       if (event.flyout) {
         element.children('a').prepend(event.flyout);
-        Drupal.attachBehaviors(element);
       }
     },
     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
@@ -165,7 +164,7 @@ Drupal.behaviors.fullCalendar = function(context) {
       return false;
     },
     loading: function( isLoading, view ) {
-      // Show thobber while working.
+      // Show throbber while working.
       $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
     },
     readyState: function() {
