@@ -219,19 +219,23 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
       '#process' => array('views_process_dependency'),
       '#dependency' => array('edit-style-options-modules-fc-url-colorbox' => array(0)),
     );
-    $ajax_callback_options = array();
-    foreach ($this->view->display as $display) {
-      if ($display->display_options['style_plugin'] == "fullcalendar_ajax_json") {
-        $ajax_callback_options[$display->display_options['path']] = $display->display_options['path'];
-      }
-    }
-    array_unshift($ajax_callback_options, '<None>');
-    $form['modules']['ajax_callback'] = array(
-      '#type' => 'select',
-      '#title' => t('AJAX callback'),
-      '#options' => $ajax_callback_options,
-      '#default_value' => $this->options['modules']['ajax_callback'],
-      '#description' => t("(Advanced) When selected the fullcalendar plugin will use this callback to pull in JSON data to the calendar. Note: You will need to enable the AJAX Fullcalendar Endpoint to configure the fields for display."),
+    $form['modules']['ajax_callback_month'] = array(
+      '#type' => 'textfield',
+      '#title' => t('AJAX callback (month view)'),
+      '#default_value' => $this->options['modules']['ajax_callback_month'],
+      '#description' => t("(Advanced) When entered, the fullcalendar plugin will use this callback to pull in JSON data to the calendar. Note: You will need to enable the AJAX Fullcalendar Endpoint to configure the fields for display."),
+    );
+    $form['modules']['ajax_callback_week'] = array(
+      '#type' => 'textfield',
+      '#title' => t('AJAX callback (week view)'),
+      '#default_value' => $this->options['modules']['ajax_callback_week'],
+      '#description' => t("(Advanced) When entered, the fullcalendar plugin will use this callback to pull in JSON data to the calendar. Note: You will need to enable the AJAX Fullcalendar Endpoint to configure the fields for display."),
+    );
+    $form['modules']['ajax_callback_day'] = array(
+      '#type' => 'textfield',
+      '#title' => t('AJAX callback (day view)'),
+      '#default_value' => $this->options['modules']['ajax_callback_day'],
+      '#description' => t("(Advanced) When entered, the fullcalendar plugin will use this callback to pull in JSON data to the calendar. Note: You will need to enable the AJAX Fullcalendar Endpoint to configure the fields for display."),
     );
   }
 }

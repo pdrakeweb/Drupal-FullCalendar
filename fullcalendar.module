@@ -211,8 +211,14 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
     'monthString' => t('Month'),
     'todayString' => t('Today'),
   );
-  if (!empty($vars['options']['modules']['ajax_callback'])) {
-    $settings['ajax_callback'] = url($vars['options']['modules']['ajax_callback']);    
+  if (!empty($vars['options']['modules']['ajax_callback_month'])) {
+    $settings['ajax_callback_month'] = url($vars['options']['modules']['ajax_callback_month']);    
+  }
+  if (!empty($vars['options']['modules']['ajax_callback_day'])) {
+    $settings['ajax_callback_day'] = url($vars['options']['modules']['ajax_callback_day']);    
+  }
+  if (!empty($vars['options']['modules']['ajax_callback_week'])) {
+    $settings['ajax_callback_week'] = url($vars['options']['modules']['ajax_callback_week']);    
   }
   drupal_add_js(array('fullcalendar' => $settings), 'setting');
   drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.views.js', 'module');
