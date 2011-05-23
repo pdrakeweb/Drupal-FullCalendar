@@ -20,7 +20,7 @@ Drupal.behaviors.fullCalendar = function(context) {
       }
       else {
         if (Drupal.settings.fullcalendar.sameWindow) {
-          window.open(calEvent.url, _self);
+          window.location.href = calEvent.url;
         }
         else {
           window.open(calEvent.url);
