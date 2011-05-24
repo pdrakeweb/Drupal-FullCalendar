@@ -221,6 +221,7 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
     $settings['ajax_callback_week'] = url($vars['options']['modules']['ajax_callback_week']);    
   }
   drupal_add_js(array('fullcalendar' => $settings), 'setting');
+  drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/js/jquery.jcache.js', 'module');
   drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.views.js', 'module');
 }
 
