@@ -165,7 +165,7 @@ Drupal.behaviors.fullCalendar = function(context) {
     },
     loading: function( isLoading, view ) {
       // Show throbber while working.
-      $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
+      $(this).find('.fc-header-title h2').toggleClass( 'fc-ajaxing', isLoading );
     },
     readyState: function() {
       Drupal.attachBehaviors();
