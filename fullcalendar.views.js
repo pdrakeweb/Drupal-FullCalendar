@@ -153,7 +153,7 @@ Drupal.behaviors.fullCalendar = function(context) {
     },
     eventRender: function( event, element, view ) {
       if (event.flyout) {
-        element.children('a').prepend(event.flyout);
+        element.append(event.flyout);
       }
     },
     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
@@ -174,7 +174,7 @@ Drupal.behaviors.fullCalendar = function(context) {
     },
     readyState: function() {
       Drupal.attachBehaviors($('.fc-content'));
-      $('.viewmore a').unbind('click').click(function(event) {
+      $('.fc-content a.viewmore').unbind('click').click(function(event) {
         var year = (parseInt($(this).attr('href').substring(1,5)));
         var month = (parseInt($(this).attr('href').substring(6,8)) - 1);
         var day = (parseInt($(this).attr('href').substring(9,11)));
