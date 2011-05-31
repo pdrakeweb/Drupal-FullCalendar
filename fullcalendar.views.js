@@ -173,7 +173,7 @@ Drupal.behaviors.fullCalendar = function(context) {
       $(this).find('.fc-header-title h2').toggleClass( 'fc-ajaxing', isLoading );
     },
     readyState: function() {
-      Drupal.attachBehaviors();
+      Drupal.attachBehaviors($('.fc-content'));
       $('.viewmore a').unbind('click').click(function(event) {
         var year = (parseInt($(this).attr('href').substring(1,5)));
         var month = (parseInt($(this).attr('href').substring(6,8)) - 1);
