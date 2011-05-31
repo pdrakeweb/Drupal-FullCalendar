@@ -106,6 +106,14 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
       '#description' => t("(Advanced) Limit the number of events per day which will be returned."),
     );
   }
+  
+  function query() {
+    if (!empty($this->options['daily_limit'])) {
+      $this->view->query->add_field(NULL, "date_format(STR_TO_DATE(" . $this->view->field[$this->options['start']]->options['table'] . '.' . $this->view->field[$this->options['start']]->options['field'] . ", '%Y-%m-%%dT%T'), '%Y-%m-%%d')", 'daily_limiter');
+      $this->view->query->orderby = array();
+      $this->view->query->add_orderby($this->view->field[$this->options['start']]->options['table'], $this->view->field[$this->options['start']]->options['field'], 'ASC');
+    }
+  }
 
   function render() {
     $output = parent::render();
