@@ -148,9 +148,9 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
             $include_event = false;
             break;
           } elseif (!empty($k) && $n[substr($structure[$key],0,10)] == $k) {
-            $structure['title'] = 'View More Events';
+            $structure['title'] = 'More Events';
             $structure['url'] = '#'.$structure[$key];
-            $structure['className'] = 'viewmore crayon crayon-5';
+            $structure['className'] = 'viewmore';
             $structure['start'] = substr($structure[$key],0,10).'T24:00';
             $structure['flyout'] = false;
             break;
