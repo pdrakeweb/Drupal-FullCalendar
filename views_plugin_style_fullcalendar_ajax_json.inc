@@ -99,14 +99,33 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
       '#options' => $fields,
       '#default_value' => $this->options['description'],
     );
+    $form['daily_limit'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Daily Event Limit'),
+      '#default_value' => $this->options['daily_limit'],
+      '#description' => t("(Advanced) Limit the number of events per day which will be returned."),
+    );
+  }
+  
+  function query() {
+    if (!empty($this->options['daily_limit'])) {
+      $this->view->query->add_field(NULL, "date_format(STR_TO_DATE(" . $this->view->field[$this->options['start']]->options['table'] . '.' . $this->view->field[$this->options['start']]->options['field'] . ", '%Y-%m-%%dT%T'), '%Y-%m-%%d')", 'daily_limiter');
+      $this->view->query->orderby = array();
+      $this->view->query->add_orderby($this->view->field[$this->options['start']]->options['table'], $this->view->field[$this->options['start']]->options['field'], 'ASC');
+    }
   }
 
   function render() {
     $output = parent::render();
     drupal_set_header('Content-type: text/javascript; charset=utf-8');
     $jsonoutput = array();
+    if (!empty($this->options['daily_limit'])) {
+      $n = array();
+      $k = $this->options['daily_limit'];
+    }
     foreach ($this->rendered_fields as $field) {
       $structure = array();
+      $include_event = true;
       foreach ($this->options as $key => $value) {
         if (!is_null($value) && $value && ($value != "0")) {
           $structure[$key] = $field[$value];
@@ -125,27 +144,40 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
         }
         if ($key == 'start') {
           $structure[$key] = array_pop(explode(' ', strip_tags($field[$value])));
+          if (!empty($k) && $n[substr($structure[$key],0,10)]++ > $k) {
+            $include_event = false;
+            break;
+          } elseif (!empty($k) && $n[substr($structure[$key],0,10)] == $k) {
+            $structure['title'] = 'More Events';
+            $structure['url'] = '#'.$structure[$key];
+            $structure['className'] = 'viewmore';
+            $structure['start'] = substr($structure[$key],0,10).'T24:00';
+            $structure['flyout'] = false;
+            break;
+          }
         }
         if ($key == 'end') {
           $structure[$key] = array_shift(explode(' ', strip_tags($field[$value])));
         }
       }
-      if (TRUE) {
+      if ($include_event) {
         // Add unexcluded rendered fields to flyout.  This is should be in a seperate theme func.
         // @todo - This doesn't work, but it feels right. :)
         //$structure['flyout'] = theme(array('views_view_fields'), $this->view, $this->options, $row, 'nid');
-        $structure['flyout'] = '<span class="crayon-popup"><span class="crayon-popup-label">';
-        foreach ($this->display->display_options['fields'] as $field_name => $options) {
-          if (empty($options['exclude'])) {
-            $structure['flyout'] .= '<div>' . $field[$field_name] . '</div>';
+        if (!isset($structure['flyout'])) {
+          $structure['flyout'] = '<span class="crayon-popup"><span class="crayon-popup-label">';
+          foreach ($this->display->display_options['fields'] as $field_name => $options) {
+            if (empty($options['exclude'])) {
+              $structure['flyout'] .= '<div>' . $field[$field_name] . '</div>';
+            }
           }
+          if (spaces_access_admin()) {
+            $structure['flyout'] .= l('Edit', 'node/' . $field['nid'] . '/edit/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+          }
+          $structure['flyout'] .= '</span></span>';
         }
-        if (spaces_access_admin()) {
-          $structure['flyout'] .= l('Edit', 'node/' . $field['nid'] . '/edit/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
-        }
-        $structure['flyout'] .= '</span></span>';
+        $jsonoutput[] = $structure;
       }
-      $jsonoutput[] = $structure;
     }
     return drupal_to_js($jsonoutput);
   }

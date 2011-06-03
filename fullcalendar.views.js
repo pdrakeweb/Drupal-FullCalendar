@@ -1,4 +1,32 @@
 // $Id$
+
+Date.prototype.getWeek = function (dowOffset) {
+  /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
+
+  dowOffset = typeof(dowOffset) == 'int' ? dowOffset : 0; //default dowOffset to zero
+  var newYear = new Date(this.getFullYear(),0,1);
+  var day = newYear.getDay() - dowOffset; //the day of week the year begins on
+  day = (day >= 0 ? day : day + 7);
+  var daynum = Math.floor((this.getTime() - newYear.getTime() - (this.getTimezoneOffset()-newYear.getTimezoneOffset())*60000)/86400000) + 1;
+  var weeknum;
+  //if the year starts before the middle of a week
+  if(day < 4) {
+    weeknum = Math.floor((daynum+day-1)/7) + 1;
+    if(weeknum > 52) {
+      nYear = new Date(this.getFullYear() + 1,0,1);
+      nday = nYear.getDay() - dowOffset;
+      nday = nday >= 0 ? nday : nday + 7;
+      /*if the next year starts before the middle of
+      the week, it is week #1 of that year*/
+      weeknum = nday < 4 ? 1 : 53;
+    }
+  }
+  else {
+    weeknum = Math.floor((daynum+day-1)/7);
+  }
+  return weeknum;
+};
+
 (function ($) {
 
 Drupal.behaviors.fullCalendar = function(context) {
@@ -20,7 +48,7 @@ Drupal.behaviors.fullCalendar = function(context) {
       }
       else {
         if (Drupal.settings.fullcalendar.sameWindow) {
-          window.open(calEvent.url, _self);
+          window.location.href = calEvent.url;
         }
         else {
           window.open(calEvent.url);
@@ -51,21 +79,52 @@ Drupal.behaviors.fullCalendar = function(context) {
     },
     events: function(start, end, callback) {
       // Load events from AJAX callback, if set.
-      if (Drupal.settings.fullcalendar.ajax_callback) {
-        // TODO: refactor to use "data:" block to pass arg attributes from filters
-        var argattr = "";
-        if (window.location.href.indexOf('?') != -1) {
-          argattr = window.location.href.slice(window.location.href.indexOf('?'));
-        }
-        var argdate = new Date((start.getTime()+end.getTime())/2);
-        var argdateStr = argdate.getFullYear() + "-" + (argdate.getMonth()+1)
-        $.ajax({
-          url: Drupal.settings.fullcalendar.ajax_callback + '/' + argdateStr + argattr,
-          dataType: 'json',
-          success: function(events) {
-            callback(events);
+      var argattr = "";
+      if (window.location.href.indexOf('?') != -1) {
+        argattr = window.location.href.slice(window.location.href.indexOf('?'));
+      }
+      switch($('#fullcalendar').fullCalendar('getView').name) {
+        case 'agendaDay':
+          if (Drupal.settings.fullcalendar.ajax_callback_day) {
+            var argdate = start;
+              var argdateStr = argdate.getFullYear() + "-" + (argdate.getMonth()+1) + "-" + (argdate.getDate());
+              var eventUrl = Drupal.settings.fullcalendar.ajax_callback_day + '/' + argdateStr + argattr;
           }
-        });
+          break;  
+        case 'agendaWeek':
+          if (Drupal.settings.fullcalendar.ajax_callback_week) {
+            var argdate = start;
+              var argdateStr = argdate.getFullYear() + "-W" + (argdate.getWeek()+1);
+              var eventUrl = Drupal.settings.fullcalendar.ajax_callback_week + '/' + argdateStr + argattr;
+          } else {
+            if (Drupal.settings.fullcalendar.ajax_callback_month) {
+                var argdate = new Date((start.getTime()+end.getTime())/2);
+                var argdateStr = argdate.getFullYear() + "-" + (argdate.getMonth()+1);
+                var eventUrl = Drupal.settings.fullcalendar.ajax_callback_month + '/' + argdateStr + argattr;
+            }
+          }
+          break;
+        case 'month':
+          if (Drupal.settings.fullcalendar.ajax_callback_month) {
+            var argdate = new Date((start.getTime()+end.getTime())/2);
+            var argdateStr = argdate.getFullYear() + "-" + (argdate.getMonth()+1);
+            var eventUrl = Drupal.settings.fullcalendar.ajax_callback_month + '/' + argdateStr + argattr;
+          }
+          break;
+      }
+      if (eventUrl) {
+    	  if ($.jCache.getItem(eventUrl)) {
+    		callback($.jCache.getItem(eventUrl));
+    	  } else {
+    		$.ajax({
+	          url: eventUrl,
+	          dataType: 'json',
+	          success: function(events) {
+	        	$.jCache.setItem(this.url, events);
+	            callback(events);
+	          }
+	        });  
+    	  }
         return;  // Don't load events from page.
       }
       var events = [];
@@ -94,8 +153,7 @@ Drupal.behaviors.fullCalendar = function(context) {
     },
     eventRender: function( event, element, view ) {
       if (event.flyout) {
-        element.children('a').prepend(event.flyout);
-        Drupal.attachBehaviors(element);
+        element.append(event.flyout);
       }
     },
     eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
@@ -111,9 +169,21 @@ Drupal.behaviors.fullCalendar = function(context) {
       return false;
     },
     loading: function( isLoading, view ) {
-      // Show thobber while working.
-      $(this).find('h2.fc-header-title').toggleClass( 'fc-ajaxing', isLoading );
-    }
+      // Show throbber while working.
+      $(this).find('.fc-header-title h2').toggleClass( 'fc-ajaxing', isLoading );
+    },
+    readyState: function() {
+      Drupal.attachBehaviors($('.fc-content'));
+      $('.fc-content a.viewmore').unbind('click').click(function(event) {
+        var year = (parseInt($(this).attr('href').substring(1,5)));
+        var month = (parseInt($(this).attr('href').substring(6,8)) - 1);
+        var day = (parseInt($(this).attr('href').substring(9,11)));
+        $('#fullcalendar').fullCalendar('changeView', 'agendaDay');
+        $('#fullcalendar').fullCalendar('gotoDate', year, month, day);
+        $('#fullcalendar').fullCalendar('refetchEvents');
+        event.preventDefault();
+      });
+    },
   });
 
   var fullcalendarUpdate = function(response) {
