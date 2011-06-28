@@ -8,7 +8,18 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
    */
   function option_definition() {
     $options = parent::option_definition();
-    
+    $options['field'] = 0;
+    $options['index'] = 0;
+    $options['nid'] = 0;
+    $options['title'] = 0;
+    $options['start'] = 0;
+    $options['end'] = 0;
+    $options['url'] = 0;
+    $options['allDay'] = 0;
+    $options['className'] = 0;
+    $options['editable'] = 0;
+    $options['description'] = 0;
+    $options['daily_limit'] = '';    
     return $options;
   }
 
