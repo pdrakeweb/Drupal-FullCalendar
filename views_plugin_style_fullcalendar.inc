@@ -22,6 +22,9 @@ class views_plugin_style_fullcalendar extends views_plugin_style {
         'fc_theme' => array('default' => FALSE),
         'fc_url_colorbox' => array('default' => FALSE),
         'fc_window' => array('default' => FALSE),
+        'ajax_callback_month' => '',
+        'ajax_callback_week' => '',
+        'ajax_callback_day' => '',
       ),
     );
     $options['header'] = array(
