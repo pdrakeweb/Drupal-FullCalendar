@@ -175,9 +175,9 @@ Drupal.behaviors.fullCalendar = function(context) {
     readyState: function() {
       Drupal.attachBehaviors($('.fc-content'));
       $('.fc-content a.viewmore').unbind('click').click(function(event) {
-        var year = (parseInt($(this).attr('href').substring(1,5)));
-        var month = (parseInt($(this).attr('href').substring(6,8)) - 1);
-        var day = (parseInt($(this).attr('href').substring(9,11)));
+    	var year = (parseInt($(this).attr('href').substring(1,5), 10));
+        var month = (parseInt($(this).attr('href').substring(6,8), 10) - 1);
+        var day = (parseInt($(this).attr('href').substring(9,11), 10));
         $('#fullcalendar').fullCalendar('changeView', 'agendaDay');
         $('#fullcalendar').fullCalendar('gotoDate', year, month, day);
         $('#fullcalendar').fullCalendar('refetchEvents');
