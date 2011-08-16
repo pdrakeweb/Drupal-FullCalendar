@@ -123,6 +123,9 @@ class views_plugin_style_fullcalendar_ajax_json extends views_plugin_style {
       $n = array();
       $k = $this->options['daily_limit'];
     }
+    if (empty($this->rendered_fields)) {
+      return drupal_to_js($jsonoutput);
+    }
     foreach ($this->rendered_fields as $field) {
       $structure = array();
       $include_event = true;
