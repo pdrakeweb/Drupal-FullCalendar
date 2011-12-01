@@ -27,26 +27,6 @@ function fullcalendar_views_api() {
 }
 
 /**
- * Implementation of hook_init().
- */
-function fullcalendar_init() {
-  drupal_add_js(fullcalendar_get_path());
-  drupal_add_css(variable_get('fullcalendar_path', FULLCALENDAR_PATH) . '/fullcalendar.css');
-  drupal_add_css(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.custom.css');
-  ctools_include('modal');
-  ctools_modal_add_js();
-
-  // We need some jQuery UI files.
-  $files = array(
-    'ui.draggable',
-    'ui.droppable',
-    'ui.resizable',
-    'effects.highlight',
-  );
-  jquery_ui_add($files);
-}
-
-/**
  * Implementation of hook_perm().
  *
  * @return array An array of valid permissions for the fullcalendar module
@@ -182,10 +162,28 @@ function theme_fullcalendar_classname($node) {
   return implode(' ', $className);
 }
 
+function _fullcalendar_load_assets() {
+  drupal_add_js(fullcalendar_get_path());
+  drupal_add_css(variable_get('fullcalendar_path', FULLCALENDAR_PATH) . '/fullcalendar.css');
+  drupal_add_css(drupal_get_path('module', 'fullcalendar') . '/fullcalendar.custom.css');
+  ctools_include('modal');
+  ctools_modal_add_js();
+
+  // We need some jQuery UI files.
+  $files = array(
+    'ui.draggable',
+    'ui.droppable',
+    'ui.resizable',
+    'effects.highlight',
+  );
+  jquery_ui_add($files);
+}
+
 /**
  * Pass settings to JavaScript.
  */
 function template_preprocess_views_view_fullcalendar(&$vars) {
+  _fullcalendar_load_assets();
   $settings = array(
     'defaultView' => $vars['options']['display']['fc_view'],
     'firstDay' => $vars['options']['display']['fc_firstday'],
@@ -229,6 +227,7 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
  * Prepare variables for template file invoked for node row type
  */
 function template_preprocess_views_view_node_fullcalendar(&$vars) {
+  _fullcalendar_load_assets();
   if (isset($vars['view']->empty_text)) {
     $vars['empty_text'] = $vars['view']->empty_text;
     return;
