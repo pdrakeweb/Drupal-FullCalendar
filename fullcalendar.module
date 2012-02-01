@@ -210,13 +210,13 @@ function template_preprocess_views_view_fullcalendar(&$vars) {
     'todayString' => t('Today'),
   );
   if (!empty($vars['options']['modules']['ajax_callback_month'])) {
-    $settings['ajax_callback_month'] = url($vars['options']['modules']['ajax_callback_month']);    
+    $settings['ajax_callback_month'] = url($vars['options']['modules']['ajax_callback_month']);
   }
   if (!empty($vars['options']['modules']['ajax_callback_day'])) {
-    $settings['ajax_callback_day'] = url($vars['options']['modules']['ajax_callback_day']);    
+    $settings['ajax_callback_day'] = url($vars['options']['modules']['ajax_callback_day']);
   }
   if (!empty($vars['options']['modules']['ajax_callback_week'])) {
-    $settings['ajax_callback_week'] = url($vars['options']['modules']['ajax_callback_week']);    
+    $settings['ajax_callback_week'] = url($vars['options']['modules']['ajax_callback_week']);
   }
   drupal_add_js(array('fullcalendar' => $settings), 'setting');
   drupal_add_js(drupal_get_path('module', 'fullcalendar') . '/js/jquery.jcache.js', 'module');
@@ -454,6 +454,16 @@ function fullcalendar_get_path() {
 function fullcalendar_views_pre_execute(&$view) {
   if (!empty($view->display[$view->current_display]->display_options['style_options']['daily_limit'])) {
     $query = $view->build_info['query'];
-    $view->build_info['query'] = 'SELECT * FROM ( SELECT *, @num := if(@type = daily_limiter, @num + 1, 1) AS row_number, @type := daily_limiter AS daily_limiter2 FROM (' . $query . ') AS a ) AS a WHERE row_number <= ' . ($view->display[$view->current_display]->display_options['style_options']['daily_limit'] + 1);
+    $fields = array();
+    foreach($view->query->fields as $key => &$field) {
+      if ($field['alias']) {
+        $fields[] = $field['alias'];
+      } else {
+        $fields[] = $field['field'];
+      }
+    }
+    $inner_fields = 'a.' . implode(', a.', $fields);
+    $outer_fields = 'node.' . implode(', node.', $fields). ', row_number';
+    $view->build_info['query'] = 'SELECT ' . $outer_fields . ' FROM ( SELECT ' . $inner_fields . ', @num := if(@type = daily_limiter, @num + 1, 1) AS row_number, @type := daily_limiter AS daily_limiter2 FROM (' . $query . ') AS a ) AS node WHERE row_number <= ' . ($view->display[$view->current_display]->display_options['style_options']['daily_limit'] + 1);
   }
 }
